@@ -1,0 +1,52 @@
+version: "3.7"
+services:
+  db:
+    image: postgres
+    container_name: database
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres # The PostgreSQL user (useful to connect to the database)
+      - POSTGRES_PASSWORD=postgres # The PostgreSQL password (useful to connect to the database)
+      - POSTGRES_DB=benz
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ./
+      dockerfile: Dockerfile-api
+    container_name: api
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - GIN_MODE=debug
+      - POSTGRES_DATABASE=benz
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_HOST=database
+      - POSTGRES_PORT=5432
+      - WEBAPP_URL=http://webapp:3000
+      - RPC_URL=http://127.0.0.1:8545
+      - CONTRACT_ADDRESS=0x5FbDB2315678afecb367f032d93F642f64180aa3
+    ports:
+      - "8081:8081"
+
+  webapp:
+    build:
+      context: ./
+      dockerfile: Dockerfile-webapp
+    container_name: webapp
+    depends_on:
+      - db
+      - api
+    environment:
+      - NEXT_PUBLIC_BACKEND_URL=http://api:8081
+      - CONTRACT_ADDRESS=0x5FbDB2315678afecb367f032d93F642f64180aa3
+      - IPFS_URL=http://localhost:8080/ipfs/
+    ports:
+      - "3000:3000"
