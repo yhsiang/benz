@@ -1,0 +1,16 @@
+FROM golang:1.19.3-alpine AS build
+RUN apk add build-base
+WORKDIR /app
+
+COPY go.mod .
+COPY go.sum .
+COPY ./cmd ./cmd
+COPY ./pkg ./pkg
+RUN go mod download
+
+RUN go build -o server ./cmd/api/main.go
+
+FROM alpine:latest
+WORKDIR /app
+COPY --from=build /app/server .
+CMD ["/app/server", "-H", "0.0.0.0"]
