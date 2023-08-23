@@ -54,7 +54,8 @@ Open browser and browse `http://localhost:3000`
 2. copy .env.sample to .env and modify those values
 3. run backend `$ godotenv -f .env -- go run ./cmd/api/main.go`
 4. modify `web-app/.env.local`
-5. run frontend `$ npm run dev`
+5. install frontend dependencies `$ npm run install:dev`
+6. run frontend `$ npm run dev`
 
 ## Note
 

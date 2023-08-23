@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "install:dev": "cd web-app && npm install",
     "dev": "cd web-app && npm run dev",
     "test": "npx hardhat test"
   },
